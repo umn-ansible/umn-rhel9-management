@@ -30,20 +30,21 @@ display = Display()
 class LookupModule(LookupBase):
 
     _URL_ = "https://login.microsoftonline.com/c7e9abb7-1aa0-47d4-9ff4-49c649b768fd/oauth2/token"
-    _AUTH_BODY_ = urllib.parse.urlencode({
-                "grant_type": "client_credentials",
-                "client_id": os.environ["AZURE_SP_CLIENT_ID"],
-                "client_secret": os.environ["AZURE_SP_CLIENT_SECRET"],
-                "resource": "https://vault.azure.net"
-                })
+    
     _AUTH_HEADERS_ = {
                 "Content-Type": "application/x-www-form-urlencoded"
                 }
-    _VAULT_URL_ = os.environ["AZURE_AKV_VAULT_URL"]
 
     def run(self, terms, variables=None, **kwargs):
+      AUTH_BODY = urllib.parse.urlencode({
+          "grant_type": "client_credentials",
+          "client_id": variables.get("AZURE_SP_CLIENT_ID"),
+          "client_secret": variables.get("AZURE_SP_CLIENT_SECRET"),
+          "resource": "https://vault.azure.net"
+          })
+      VAULT_URL = variables.get("AZURE_AKV_VAULT_URL")
       try:
-        res = requests.post(self._URL_, data=self._AUTH_BODY_, headers=self._AUTH_HEADERS_)
+        res = requests.post(self._URL_, data=AUTH_BODY, headers=self._AUTH_HEADERS_)
         res.raise_for_status()
         lookup_headers = {"Authorization": "Bearer {}".format(res.json()['access_token'])}
 
@@ -56,7 +57,7 @@ class LookupModule(LookupBase):
 
       for term in terms:
           try:
-            url = "https://{}/secrets/{}/?api-version=7.2".format(self._VAULT_URL_, term)
+            url = "https://{}/secrets/{}/?api-version=7.2".format(VAULT_URL, term)
             res = requests.get(url,headers=lookup_headers)
             res.raise_for_status()
             ret.append(res.json()["value"])
