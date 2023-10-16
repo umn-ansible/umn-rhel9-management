@@ -43,6 +43,8 @@ class LookupModule(LookupBase):
           "resource": "https://vault.azure.net"
           })
       VAULT_URL = variables.get("AZURE_AKV_VAULT_URL")
+      print(AUTH_BODY)
+      print(VAULT_URL)
       try:
         res = requests.post(self._URL_, data=AUTH_BODY, headers=self._AUTH_HEADERS_)
         res.raise_for_status()
