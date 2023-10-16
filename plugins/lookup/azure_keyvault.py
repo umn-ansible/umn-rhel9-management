@@ -42,17 +42,15 @@ class LookupModule(LookupBase):
           "client_secret": variables.get("AZURE_SP_CLIENT_SECRET"),
           "resource": "https://vault.azure.net"
           })
-      print(AUTH_BODY)
       VAULT_URL = variables.get("AZURE_AKV_VAULT_URL")
-      print(AUTH_URL)
       try:
         res = requests.post(self._URL_, data=AUTH_BODY, headers=self._AUTH_HEADERS_)
         res.raise_for_status()
         lookup_headers = {"Authorization": "Bearer {}".format(res.json()['access_token'])}
       except requests.exceptions.HTTPError as e:
-        raise AnsibleError('There was an error getting a token. The lookup API returned %s', res.status_code)
+        raise AnsibleError('There was an error getting a token. The lookup API returned %s' % res.status_code)
       except Exception as e:
-        raise AnsibleError('There was an error %s', e)
+        raise AnsibleError('There was an error %s' % e)
       
       ret = []
 
@@ -64,8 +62,8 @@ class LookupModule(LookupBase):
             ret.append(res.json()["value"])
 
           except requests.exceptions.HTTPError as e:
-            raise AnsibleError('There was an error getting the credential. The lookup API returned %s', res.status_code)
+            raise AnsibleError('There was an error getting the credential. The lookup API returned %s' % res.status_code)
           except Exception as e:
-            raise AnsibleError('There was an error %s', e)
+            raise AnsibleError('There was an error %s' % e)
 
       return ret
