@@ -38,8 +38,8 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
       AUTH_BODY = urllib.parse.urlencode({
           "grant_type": "client_credentials",
-          "client_id": variables.get("clientid"),
-          "client_secret": variables.get("clientsecret"),
+          "client_id": variables.get("azure_clientid"),
+          "client_secret": variables.get("azure_clientsecret"),
           "resource": "https://vault.azure.net"
           })
       VAULT_URL = variables.get("AZURE_AKV_VAULT_URL")
