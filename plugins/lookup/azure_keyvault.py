@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
   description:
     - Follows https://learn.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#first-case-access-token-request-with-a-shared-secret
     - This lookup returns the token from Azure Key Vault for UMN Tenants
-    - You need to define 3 environment variables for this to work
+    - You need to define 3 variables for this to work
         - AZURE_SP_CLIENT_ID
         - AZURE_SP_CLIENT_SECRET
         - AZURE_AKV_VAULT_URL
@@ -38,13 +38,11 @@ class LookupModule(LookupBase):
     def run(self, terms, variables=None, **kwargs):
       AUTH_BODY = urllib.parse.urlencode({
           "grant_type": "client_credentials",
-          "client_id": variables.get("azure_clientid"),
-          "client_secret": variables.get("azure_clientsecret"),
+          "client_id": self._templar.template(variables['AZURE_SP_CLIENT_ID']),
+          "client_secret": self._templar.template(variables['AZURE_SP_CLIENT_SECRET']),
           "resource": "https://vault.azure.net"
           })
-      VAULT_URL = variables.get("AZURE_AKV_VAULT_URL")
-      print(AUTH_BODY)
-      print(VAULT_URL)
+      VAULT_URL = self._templar.template(variables['AZURE_AKV_VAULT_URL'])
       try:
         res = requests.post(self._URL_, data=AUTH_BODY, headers=self._AUTH_HEADERS_)
         res.raise_for_status()
