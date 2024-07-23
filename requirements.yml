@@ -1,3 +1,0 @@
-roles:
-  - name: user_management
-    src: git+https://github.com/umn-ansible/umn_user_management_role.git
